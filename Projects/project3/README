@@ -1,0 +1,10 @@
+1. The submission contains 4 files
+	- a README
+	- a report
+	- Code Folder
+	- Results Folder
+
+2. We have made use of Shell scripts to run our expirements. 
+   Each shell script invokes a .tcl file by passing desired command line arguments to simulate with variations.
+3. The aggregated parsed results of each experiment can be found under the results folder.
+4. The graphs for each experiment can found under the Resuls/Graphs folder

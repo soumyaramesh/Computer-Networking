@@ -1,0 +1,58 @@
+
+This file serves as the README for the roll your own CDN Project
+
+High level approach
+
+The following are the two key components
+
+1. DNS Server -
+2. HTTP Server
+
+The DNS server is used to make determine the best IP for the client who makes a DNS call .
+Once the IP is determined, HTTP requests are made to this IP.A caching mechanism is implemented
+for better performance
+
+The HTTP server gets an incoming request and it's job is to server the request. A caching mechanism is implemented
+for better performance
+
+Detailed Approach
+
+1. DNS Server
+
+We've used active measurements to determine the best IP with the help of  scamper command and a
+Measurement Program, which sits on each of the Replica servers and waits.
+
+When a client makes a request to this DNS server, the DNS server extracts the clientIP and sends it out to all
+of the Measurement programs (on different Replica servers). The Measurement programs all ping the Client to detemine
+the respective latencies, amd then sends this back to the DNS server.
+
+The DNS server then determines the replica server with least latency and returns this replica server's IP back to
+the client.
+
+We have cached this client to best-Replica mapping in memory.
+
+2. HTTP Server
+
+
+The Http server serves one GET request at a time. We frame the GET request based on the resource that was requested.
+We maintained an in memory cache using an ordered dictionary limited to 10MB. Once a request a received, we first check
+the in memory cache for the given resource. If available, we return the content to the client . If not found, we check
+the disk cache for the file. If available, we return the content to the client.
+In both these cases, we push the Least Recently Used resource to the back of the queue and bring the most recently
+used request to the top. This will favour requests that follow Zipf distribution. If the requested resource is not found in either case, we make a request
+to the origin server and cache this requested resource. While caching, we first try to cache it in memory. If 10MB is
+exceeded in memory, we spill over to disk. We store each resource as a file on disk. Once the disk is exhausted, we
+delete the least seen resource and make space for new resource caching. While checking for avaialble disk space, we
+subtract the existing content size on the disk from 10MB and use the remaining space.
+
+
+Challenges.
+
+-Testing the DNS server from different locations was not very intuitive
+- Carefully Constructing the DNS response was challenging.
+- We initially used sys.getsizeof to find the size used by the mem cache dictionary.We later realized that this returned
+an inaccurate size since it considered only the size of the reference to the object rather than the object itself.
+We tackled this by writing a method that identifies the type of the object and then computed the size.
+-Spilling over the in memory cache contents to disk when the in memory cache was exhausted was a challenge.
+
+

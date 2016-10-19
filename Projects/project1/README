@@ -1,0 +1,27 @@
+Approach
+
+- Depending on the input split functionaliy into SSL or nonSSL mode
+- In case of NON SSL mode, open a socket with the given host and port and 
+  then proceed to send a HELLO Message. Once the Hello Message is responded
+  with a STATUS message start solving equations until BYE is received
+  and print secret_flag
+
+- In the case of an SSL use the Publickeystore created before hand to
+  send requests.
+  To create the public keystore 
+    - Receive the Server's public key into a .cert file
+    - Generate a Self signed Certificate into a private keystore
+    - Use this store to extract a public keystore
+    - Embed the Server's public key  into the public keystore (which should
+      now contain the both server's and the client's public keys)
+
+
+  Use this keystore to help get create an SSL socket
+- Once socekt is created establish handshake
+- After handshake , same set of functionality as NON SSL Mode
+
+- Throughout , server response is constanly checked for corruptness
+
+- Testing was done by trying out different input parameters and using different
+  combinations .
+

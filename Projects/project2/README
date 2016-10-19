@@ -1,0 +1,19 @@
+High level approach:
+
+1.Make a GET request to the target domain and read response to get a valid csrf token.
+2.Login with a POST Request with the token from the previous step.
+3.Use the repsonse of the login to retrive sessionid
+4.This session id is to be used in all subsequent requests to crawl
+5.Make a GET request on homepage and read the reponse and add links to queue
+6.Start crawling those link thatare not already visited and only on the domain (cs5700sp16.ccs.neu.edu) using BFS
+7.Maintain a visited list to avoid duplicate crawling
+8.Maintain a queue to store newly discovered URLs
+9. search for a secret flag in the response.
+10. print a flag if found
+11.exit when 5 flags are found
+
+
+Challenges
+
+Handling different HTTP scenarios was a challenge that we faced (especially the 500 which randomly shows up)
+

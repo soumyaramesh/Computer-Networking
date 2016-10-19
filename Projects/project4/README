@@ -1,0 +1,38 @@
+Instructions to run the program - 
+
+./rawhttpget [URL]
+
+An example invocation of the program might look like this:
+./rawhttpget http://david.choffnes.com/classes/cs4700sp16/project4.php
+
+IMPORTANT NOTES -
+ 1) The command to set a rule in iptables that drops outgoing TCP RST packets is included in the script
+ 2) The original source code without the extra credit part is also submitted as a separate file - RawSocketsWithoutEth.py.
+ To run this, please run sudo python RawSocketsWithoutEth.py [URL]
+__________________________________________________________________________________
+
+**********EXTRA CREDIT has been solved.************
+
+High Level Approach - 
+
+The sending packet is of type socket.SOCK_RAW/IPPROTO_RAW and the receiving packet is of type socket.SOCK_RAW/IPPROTO_TCP to receive TCP Packets. Both sockets belong to the AF_INET family. 
+From the input URL, we extract the HOST and the resource and obtain the HOST IP using the hostname and getting the current machine's IP address as the Source IP. To construct the packet, we consruct the IP Header and TCP Header and TCP Header and pack them along with the data. To ensure data correctness, we compute the checksum for a given data packet.We then initiate the 3-way handshake. We start by sending a packet with the SYN flag set and receive a SYN-ACK from the server. We then send an ACK to complete the handshake. 
+We now send the GET request with HTTP 1.0 and setting the PSH flag. After receiving an ACK from the server, we start to receive data packets. Each data packet is unpacked, and the sequence number is used to verify if the packet has been received in order. We ACK the received packet by incrementing by the length of the data packet that was received. We start with congestion window = 1. For every successful ACK, we increment the congestion window. If a timeout has occured, we request for the packet again and reset the congestion window size to 1.  
+
+__________________________________________________________________________________
+
+High Level Approach for extra credit -
+
+We solved the extra credit after completing the above approach. Here, we used a AF_PACKET raw socket instead of a SOCK_RAW/IPPROTO_RAW socket.
+We constructed the Ethernet frames for each packet, along with IP and TCP headers.
+To do so, we needed to resolve the destination Mac address. We first needed to find the MAC address of the default gateway IP with an ARP request and constructing the ARP header.
+With the destination MAC address and the hardware source mac address, we then packed the ethernet frame.
+
+__________________________________________________________________________________
+
+Challenges - 
+
+We faced some challenges in establishing the 3-way handshake in ensuring the correctness of acknowledgment and sequence numbers and handling packet drops.
+With the extra credit, we faced challenges in making the ARP request to get the default gateway. We also got some junk characters which was resolved when using HTTP 1.0.
+__________________________________________________________________________________
+
